@@ -1,7 +1,7 @@
 # R_Tree
 C++ Implementation of the R(ange) Tree Data Structure for efficiently handling spatial data.
 
-NOTE: The current version of this repo is not stable and still includes print statements for development purposes.
+NOTE: The current version of this repo is not stable and includes print statements for development purposes.
 
 <figure>
 <img src=doc/tree_diagram.png>
