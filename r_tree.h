@@ -416,7 +416,6 @@ public:
     }
 
     ~R_Tree() {
-        std::cout << "freeing root\n";
         delete root;
     }
 

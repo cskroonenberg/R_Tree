@@ -27,12 +27,6 @@ class Node
     }
 
     ~Node() {
-        // std::cout << "freeing node\n";
-        // std::cout << "\tis_leaf:" << is_leaf << "\n";
-        // std::cout << "\tparent == nullptr (root): " << (parent == nullptr) << "\n";
-        // std::cout << "\tentries.size(): " << entries.size() << "\n";
-        // std::cout << "\tpoints.size(): " << points.size() << "\n";
-
         for(int i = 0; i < static_cast<int>(entries.size()); i++){
             delete entries[i]->node;
             delete entries[i];
