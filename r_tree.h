@@ -5,10 +5,12 @@
 
 #include <iostream>
 #include <iomanip>
+#include <limits>
+#include <tuple>
+#include <math.h>
 
 #include "node.h"
 #include "rect.h"
-#include <tuple>
 
 bool VERBOSE = false;
 
@@ -420,6 +422,19 @@ private:
         }
     }
 
+    // Calculate Euclidean distance between points
+    double distance(Point p1, Point p2)
+    {
+        double x = p1.x - p2.x; //calculating number to square in next step
+        double y = p1.y - p2.y;
+        double dist;
+
+        dist = pow(x, 2) + pow(y, 2);       //calculating Euclidean distance
+        dist = sqrt(dist);                  
+
+        return dist;
+    }
+
 public:
     // Constructor
     R_Tree() {
@@ -514,9 +529,22 @@ public:
     }
 
     // Return the closest point in the tree to point Q
-    //Point search(Point q) {
-        // TODO
-    //}
+    Point closest_point(Point q) {
+        Node* l = chooseLeaf(root, q);
+
+        double min_distance = std::numeric_limits<double>::max();
+        Point closest;
+
+        for(Point p : l->points) {
+            double p_distance = distance(p, q);
+            if(p_distance < min_distance) {
+                min_distance = p_distance;
+                closest = p;
+            }
+        }
+
+        return closest;
+    }
 
     int size() {
         return m_size;
