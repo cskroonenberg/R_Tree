@@ -4,6 +4,7 @@
 #define R_TREE
 
 #include <iostream>
+#include <iomanip>
 
 #include "node.h"
 #include "rect.h"
@@ -12,7 +13,7 @@
 bool VERBOSE = false;
 
 class R_Tree {
-    private:
+private:
     Node* root;
     int height; // TODO
     int size;   // TODO
@@ -74,30 +75,27 @@ class R_Tree {
 
         // AT2. If N is root, stop and return true;
         if(n == root) {
-            return std::tuple<bool, Node*, Node*>(false, n, nullptr);
+            return std::tuple<bool, Node*, Node*>(nn != nullptr, n, nn);
         }
 
         // AT3. Adjust coverting rectangle in parent entry
         Node* p = findParent(n);
 
         if(p == nullptr) {
-            n->print("p_sus1\t");
+            n->print("no_parent\t");
         }
 
         Node::Entry* e_n = p->getEntry(n);
 
         if(e_n == nullptr) {
-            p->print("p_sus2\t");
-            std::cout << "~!~!~!~!~!~~!!!!!!!!!!!!!~~~~~~~~~~~~~~~!!!!!!!!!!!!!\n";
-            n->print("n_sus\t");
+            p->print("no_entry_n\t");
+            n->print("needs_entry\t");
         }
 
         adjustRect(&e_n->box, n);
 
         // If no split occured before function call, continue recursing
         if(nn == nullptr) {
-            //std::cout << "recursive adjust Tree\n";
-            //p->print("n:\t");
             return adjustTree(p, nullptr);
         }
 
@@ -114,33 +112,36 @@ class R_Tree {
         if(p->size() > p->capacity()) {
             std::cout << "adjustTree split\n";
             std::tie(p, pp) = quadraticSplit(p);
-            // p->print("p\t");
-            // pp->print("pp\t");
 
-            //std::cout << "adjust -> split\n";
-            //p->print("n:\t");
-            adjustTree(p, pp);
-            return std::tuple<bool, Node*, Node*>(p == root, p, pp);
+            return adjustTree(p, pp);
+            //return std::tuple<bool, Node*, Node*>(p == root, p, pp);
         }
         
         // AT5. Move up to next level. Set nn = pp if split occured.
-        //std::cout << "adjust -> last line\n";
-        //p->print("n:\t");
         return adjustTree(p, pp);
     }
 
-    std::tuple<Node*, Node*> quadraticSplit(Node* n) {
+    std::pair<Node*, Node*> quadraticSplit(Node* n) {
         if(VERBOSE) {std::cout<<"quadraticSplit\n";}
+        std::pair<Node*, Node*> split_nodes;
         if(n->isLeaf()) {
             std::cout << "splitLeaf\n";
-            return splitLeaf(n);
+            split_nodes = splitLeaf(n);
         } else {
             std::cout << "splitBramch\n";
-            return splitBranch(n);
+            split_nodes = splitBranch(n);
         }
+
+        std::cout << "Split.first:\n";
+        split_nodes.first->print();
+        std::cout << "Split.second:\n";
+        split_nodes.second->print();
+        std::cout << "root:\n";
+        root->print();
+        return split_nodes;
     }
 
-    std::tuple<Node*, Node*> splitBranch(Node* n) {
+    std::pair<Node*, Node*> splitBranch(Node* n) {
         if(VERBOSE) {std::cout<<"splitBranch\n";}
         Node* nn = new Node();
         nn->is_leaf = false;
@@ -186,15 +187,10 @@ class R_Tree {
             }
         }
 
-
-        std::cout << "splitBranch done. Results:\n";
-        // n->print("n\t");
-        // nn->print("nn\t");
-        // root->print("root\t");
-        return std::tuple<Node*, Node*>(n, nn);
+        return std::pair<Node*, Node*>(n, nn);
     }
 
-    std::tuple<Node*, Node*> splitLeaf(Node* n) {
+    std::pair<Node*, Node*> splitLeaf(Node* n) {
         if(VERBOSE) {std::cout<<"splitLeaf\n";}
         Node* nn = new Node();
 
@@ -239,7 +235,7 @@ class R_Tree {
             }
         }
 
-        return std::tuple<Node*, Node*>(n, nn);
+        return std::pair<Node*, Node*>(n, nn);
     }
 
     std::tuple<int, int> pickSeedsBranch(Node* n) {
@@ -411,7 +407,7 @@ class R_Tree {
         }
     }
 
-    public:
+public:
     R_Tree() {
         height = 0;
         size = 0;
@@ -424,12 +420,10 @@ class R_Tree {
         delete root;
     }
 
-    void insert(float x, float y){
-        if(VERBOSE) {std::cout<<"insert " << x << " " << y << "\n";}
-        std::cout<<"insert " << x << " " << y << "\n";
+    void insert(Point p){
+        if(VERBOSE) {std::cout<<"insert " << p.x << " " << p.y << "\n";}
+        std::cout<<"insert " << p.x << " " << p.y << "\n";
         // I1. Find position for new record
-        Point p(x, y);
-        
         Node* l = chooseLeaf(root, p);
         Node* ll = nullptr;
 
@@ -437,28 +431,14 @@ class R_Tree {
         l->points.push_back(p);
 
         if(l->size() > l->capacity()) {
-            //std::cout << "insert split\n";
             std::tie(l, ll) = quadraticSplit(l);
-            //l->print("l\t");
-            //ll->print("ll\t");
         }
 
         // I3. Propagate changes upward
         bool root_split = false;
         Node* split_n = nullptr;
         Node* split_nn = nullptr;
-        //std::cout<< "leaf adjust\n";
-        //l->print("n:\t");
         std::tie(root_split, split_n, split_nn) = adjustTree(l, ll);
-        
-        //std::cout << "l == root = " << (l == root) << "\n";
-        //std::cout << "root_split = " << root_split << "\n";
-        //if(split_n != nullptr) {
-        //    split_n->print("splt_n\t");
-        //}
-        //if(split_nn != nullptr) {
-        //    split_nn->print("splt_nn\t");
-        //}
 
         // I4. Grow tree taller if root splits
         if(l == root && ll != nullptr) {
@@ -490,19 +470,21 @@ class R_Tree {
             root->is_leaf = false;
         } else if (split_nn != nullptr) { // Non-root branch split
             std::cout << "SPILT 3 - Non-root branch split\n";
-            //split_n->print("split_n\t");
-            //split_nn->print("split_nn\t");
         } else if (ll != nullptr) { // Non-root leaf split
             std::cout << "SPILT 4 - Non-root leaf split\n";
-            //l->print("l\t");
-            //ll->print("ll\t");
-            split_n->print("split_n\t");
         }
     }
 
     void print() {
+        std::cout << std::setprecision(4);
         if(root != nullptr) {
             root->print();
+        }
+    }
+
+    void plot() {
+        if(root != nullptr) {
+            root->plot();
         }
     }
 
