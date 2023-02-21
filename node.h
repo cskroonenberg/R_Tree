@@ -78,20 +78,24 @@ class Node
 
     void print(std::string indent = "") {
         if(isLeaf()) {
-            std::cout << indent << "LEAF\n";
+            std::cout << "LEAF [";
             for(Point p : points) {
-                std::cout << indent << "Point\t" << p.x << "\t" << p.y << "\n";
+                std::cout << "(" << p.x << ", " << p.y << "),\t";
             }
+            std::cout << "]\n";
         } else {
             int i = 1;
-            std::cout << indent << "BRANCH\n";
+            std::cout << "BRANCH\n";
             for(Entry* e : entries) {
-                std::string e_is_leaf = e->node->isLeaf() ? "leaf" : "branch";
-                std::cout << indent << "Entry " << i << "\t" << e_is_leaf << "\n";
+                std::cout << indent << "Entry " << i << "\t";
                 e->node->print(indent + "\t");
                 i++;
             }
         }
+    }
+
+    void plot() {
+        
     }
 
 };
