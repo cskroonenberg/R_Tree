@@ -15,9 +15,10 @@ bool VERBOSE = false;
 class R_Tree {
 private:
     Node* root;
-    int height; // TODO
-    int size;   // TODO
+    int m_height; // TODO
+    int m_size;
 
+    // Choose the leaf to insert a Point p into
     Node* chooseLeaf(Node* n, Point p) {
         if(VERBOSE) {std::cout<<"chooseLeaf\n";}
         if(n->isLeaf()) {
@@ -53,6 +54,7 @@ private:
         return _findParent(root, n);
     }
 
+    // Recursive tree search for parent node
     Node* _findParent(Node* p, Node* n) {
         for(Node::Entry* e : p->entries) {
             if(e->node == n) {
@@ -121,6 +123,7 @@ private:
         return adjustTree(p, pp);
     }
 
+    // Split a node into two nodes
     std::pair<Node*, Node*> quadraticSplit(Node* n) {
         if(VERBOSE) {std::cout<<"quadraticSplit\n";}
         std::pair<Node*, Node*> split_nodes;
@@ -141,6 +144,7 @@ private:
         return split_nodes;
     }
 
+    // Split a Branch node into two Branch nodes
     std::pair<Node*, Node*> splitBranch(Node* n) {
         if(VERBOSE) {std::cout<<"splitBranch\n";}
         Node* nn = new Node();
@@ -190,6 +194,7 @@ private:
         return std::pair<Node*, Node*>(n, nn);
     }
 
+    // Split a Leaf node into two Leaf nodes
     std::pair<Node*, Node*> splitLeaf(Node* n) {
         if(VERBOSE) {std::cout<<"splitLeaf\n";}
         Node* nn = new Node();
@@ -238,6 +243,7 @@ private:
         return std::pair<Node*, Node*>(n, nn);
     }
 
+    // Pick the entries to construct two Branch nodes from when splitting a Branch node
     std::tuple<int, int> pickSeedsBranch(Node* n) {
         if(VERBOSE) {std::cout<<"pickSeedsBranch\n";}
         // PS1. Calculate inefficiency of grouping entries together
@@ -266,6 +272,7 @@ private:
         return std::tuple<int, int>(best_i, best_j);
     }
 
+    // Pick the points to construct two Leaf nodes from when splitting a Leaf node
     std::tuple<int, int> pickSeedLeaf(Node* n) {
         if(VERBOSE) {std::cout<<"pickSeedLeaf\n";}
         // PS1. Calculate inefficiency of grouping entries together
@@ -294,6 +301,7 @@ private:
         return std::tuple<int, int>(best_i, best_j);
     }
 
+    // Identify the next point to assign when splitting a leaf
     int pickNextPoint(std::vector<Point> candidates, Rect group_1, Rect group_2) {
         if(VERBOSE) {std::cout<<"pickNextPoint\n";}
         float d1 = 0;
@@ -315,6 +323,7 @@ private:
         return best_option;
     }
 
+    // Identify the next entry to assign when splitting a branch
     int pickNextEntry(std::vector<Node::Entry*> candidates, Rect group_1, Rect group_2) {
         if(VERBOSE) {std::cout<<"pickNextEntry\n";}
         float d1 = 0;
@@ -336,6 +345,7 @@ private:
         return best_option;
     }
 
+    // Return the Rect which encloses a Node's contents
     Rect getRect(Node* n) {
         if(n->isLeaf()) {
             return getRectLeaf(n->points);
@@ -344,6 +354,7 @@ private:
         }
     }
 
+    // Return the Rect which encloses a Leaf Node's points
     Rect getRectLeaf(std::vector<Point> points) {
         if(VERBOSE) {std::cout<<"getRect\n";}
         float high_x = -std::numeric_limits<float>::infinity();
@@ -369,6 +380,7 @@ private:
         return Rect(Point(high_x, high_y), Point(low_x, low_y));
     }
 
+    // Return the Rect which encloses a Branch Node's entries
     Rect getRectBranch(std::vector<Node::Entry*> entries) {
         if(VERBOSE) {std::cout<<"getRectBranch\n";}
         float high_x = -std::numeric_limits<float>::infinity();
@@ -394,6 +406,7 @@ private:
         return Rect(Point(high_x, high_y), Point(low_x, low_y));
     }
 
+    // Update the Rect pointed to by r with the contents of a Node pointed to by n
     void adjustRect(Rect* r, Node* n) {
         if(VERBOSE) {std::cout<<"adjustRect\n";}
         if(n->isLeaf()) {
@@ -408,17 +421,20 @@ private:
     }
 
 public:
+    // Constructor
     R_Tree() {
-        height = 0;
-        size = 0;
+        m_height = 1;
+        m_size = 0;
 
         root = new Node();
     }
 
+    // Destructor
     ~R_Tree() {
         delete root;
     }
 
+    // Insert a point into the tree
     void insert(Point p){
         if(VERBOSE) {std::cout<<"insert " << p.x << " " << p.y << "\n";}
         std::cout<<"insert " << p.x << " " << p.y << "\n";
@@ -442,6 +458,7 @@ public:
         // I4. Grow tree taller if root splits
         if(l == root && ll != nullptr) {
             std::cout << "SPLIT 1 - ROOT IS LEAF\n";
+
             root = new Node();
             Rect l_r = getRect(l);
             Rect ll_r = getRect(ll);
@@ -455,6 +472,8 @@ public:
             root->is_leaf = false;
         } else if(root_split) {
             std::cout << "SPLIT 2 - ROOT IS BRANCH\n";
+            m_height +=1;
+
             Node* root_copy = root;
             root = new Node();
             Rect root_r = getRect(root_copy);
@@ -472,23 +491,39 @@ public:
         } else if (ll != nullptr) { // Non-root leaf split
             std::cout << "SPILT 4 - Non-root leaf split\n";
         }
+
+        m_size +=1;
     }
 
+    // Recursively print tree contents
     void print() {
         std::cout << std::setprecision(4);
         if(root != nullptr) {
             root->print();
         }
+
+        std::cout << "Size: " << m_size << "\n";
+        std::cout << "Height: " << m_height << "\n";
     }
 
+    // Recursively plot tree
     void plot() {
         if(root != nullptr) {
             root->plot();
         }
     }
 
-    void search() { // We just need to search for the closest point
-        // TODO: Search
+    // Return the closest point in the tree to point Q
+    //Point search(Point q) {
+        // TODO
+    //}
+
+    int size() {
+        return m_size;
+    }
+
+    int height() {
+        return m_height;
     }
 
 };
