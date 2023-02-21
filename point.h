@@ -5,10 +5,15 @@ class Point
 {
     // TODO: Check if floats are precise enough for 7 decimal coordinate precision
     public:
-    float x;
-    float y;
+    double x;
+    double y;
+    long id;
 
-    Point(float x, float y) : x(x), y(y) {}
+    Point(double x, double y) : x(x), y(y) {
+        id = -1;
+    }
+    
+    Point(double x, double y, long id) : x(x), y(y), id(id) {}
 
     Point() {
         x = -1;

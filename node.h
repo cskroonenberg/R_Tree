@@ -74,7 +74,7 @@ class Node
         if(isLeaf()) {
             std::cout << "LEAF [";
             for(Point p : points) {
-                std::cout << "(" << p.x << ", " << p.y << "),\t";
+                std::cout << p.id << ": (" << p.x << ", " << p.y << "),\t";
             }
             std::cout << "]\n";
         } else {
