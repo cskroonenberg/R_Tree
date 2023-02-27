@@ -114,7 +114,7 @@ private:
         p->addEntry(e_nn);
 
         if(p->size() > p->capacity()) {
-            std::cout << "adjustTree split\n";
+            //std::cout << "adjustTree split\n";
             std::tie(p, pp) = quadraticSplit(p);
 
             return adjustTree(p, pp);
@@ -452,7 +452,7 @@ public:
     // Insert a point into the tree
     void insert(TreePoint p){
         if(VERBOSE) {std::cout<<"insert " << p.x << " " << p.y << "\n";}
-        std::cout<<"insert " << p.x << " " << p.y << "\n";
+        //std::cout<<"insert " << p.x << " " << p.y << "\n";
         // I1. Find position for new record
         Node* l = chooseLeaf(root, p);
         Node* ll = nullptr;
