@@ -17,11 +17,11 @@ bool VERBOSE = false;
 class R_Tree {
 private:
     Node* root;
-    int m_height; // TODO
+    int m_height;
     int m_size;
 
-    // Choose the leaf to insert a Point p into
-    Node* chooseLeaf(Node* n, Point p) {
+    // Choose the leaf to insert a TreePoint p into
+    Node* chooseLeaf(Node* n, TreePoint p) {
         if(VERBOSE) {std::cout<<"chooseLeaf\n";}
         if(n->isLeaf()) {
             return n;
@@ -130,19 +130,19 @@ private:
         if(VERBOSE) {std::cout<<"quadraticSplit\n";}
         std::pair<Node*, Node*> split_nodes;
         if(n->isLeaf()) {
-            std::cout << "splitLeaf\n";
+            //std::cout << "splitLeaf\n";
             split_nodes = splitLeaf(n);
         } else {
-            std::cout << "splitBramch\n";
+            //std::cout << "splitBramch\n";
             split_nodes = splitBranch(n);
         }
 
-        std::cout << "Split.first:\n";
-        split_nodes.first->print();
-        std::cout << "Split.second:\n";
-        split_nodes.second->print();
-        std::cout << "root:\n";
-        root->print();
+        //std::cout << "Split.first:\n";
+        //split_nodes.first->print();
+        //std::cout << "Split.second:\n";
+        //split_nodes.second->print();
+        //std::cout << "root:\n";
+        //root->print();
         return split_nodes;
     }
 
@@ -205,10 +205,10 @@ private:
         int p_idx, pp_idx;
         std::tie(p_idx, pp_idx) = pickSeedLeaf(n);
 
-        Point p = n->points[p_idx];
-        Point pp = n->points[pp_idx];
+        TreePoint p = n->points[p_idx];
+        TreePoint pp = n->points[pp_idx];
 
-        std::vector<Point> unassigned;
+        std::vector<TreePoint> unassigned;
         unassigned.reserve(n->points.size());
 
         for(int i = 0; i < static_cast<int>(n->points.size()); i++) {
@@ -231,7 +231,7 @@ private:
 
             int next_idx = pickNextPoint(unassigned, n_rect, nn_rect);
 
-            Point next = unassigned[next_idx];
+            TreePoint next = unassigned[next_idx];
             unassigned.erase(unassigned.begin() + next_idx);
 
             // QS3. Select entry to assign
@@ -254,10 +254,10 @@ private:
 
         for(int i = 0; i < static_cast<int>(n->entries.size()); i++) {
             for(int j = i + 1; j < static_cast<int>(n->entries.size()); j++) {
-                Point max_corner(std::max(n->entries[i]->box.getHigh().x, n->entries[j]->box.getHigh().x),
+                TreePoint max_corner(std::max(n->entries[i]->box.getHigh().x, n->entries[j]->box.getHigh().x),
                                  std::max(n->entries[i]->box.getHigh().y, n->entries[j]->box.getHigh().y));
 
-                Point min_corner(std::min(n->entries[i]->box.getLow().x, n->entries[j]->box.getLow().x),
+                TreePoint min_corner(std::min(n->entries[i]->box.getLow().x, n->entries[j]->box.getLow().x),
                                  std::min(n->entries[i]->box.getLow().y, n->entries[j]->box.getLow().y));
 
                 Rect J(max_corner, min_corner);
@@ -283,10 +283,10 @@ private:
 
         for(int i = 0; i < static_cast<int>(n->points.size()); i++) {
             for(int j = i + 1; j < static_cast<int>(n->points.size()); j++) {
-                Point max_corner(std::max(n->points[i].x, n->points[j].x),
+                TreePoint max_corner(std::max(n->points[i].x, n->points[j].x),
                     std::max(n->points[i].y, n->points[j].y));
 
-                Point min_corner(std::min(n->points[i].x, n->points[j].x),
+                TreePoint min_corner(std::min(n->points[i].x, n->points[j].x),
                      std::min(n->points[i].y, n->points[j].y));
 
                 Rect J(max_corner, min_corner);
@@ -304,7 +304,7 @@ private:
     }
 
     // Identify the next point to assign when splitting a leaf
-    int pickNextPoint(std::vector<Point> candidates, Rect group_1, Rect group_2) {
+    int pickNextPoint(std::vector<TreePoint> candidates, Rect group_1, Rect group_2) {
         if(VERBOSE) {std::cout<<"pickNextPoint\n";}
         float d1 = 0;
         float d2 = 0;
@@ -357,14 +357,14 @@ private:
     }
 
     // Return the Rect which encloses a Leaf Node's points
-    Rect getRectLeaf(std::vector<Point> points) {
+    Rect getRectLeaf(std::vector<TreePoint> points) {
         if(VERBOSE) {std::cout<<"getRect\n";}
         float high_x = -std::numeric_limits<float>::infinity();
         float high_y = -std::numeric_limits<float>::infinity();
         float low_x = std::numeric_limits<float>::infinity();
         float low_y = std::numeric_limits<float>::infinity();
 
-        for(Point p : points) {
+        for(TreePoint p : points) {
             if(p.x > high_x) {
                 high_x = p.x;
             }
@@ -379,7 +379,7 @@ private:
             }
         }
 
-        return Rect(Point(high_x, high_y), Point(low_x, low_y));
+        return Rect(TreePoint(high_x, high_y), TreePoint(low_x, low_y));
     }
 
     // Return the Rect which encloses a Branch Node's entries
@@ -405,7 +405,7 @@ private:
             }
         }
 
-        return Rect(Point(high_x, high_y), Point(low_x, low_y));
+        return Rect(TreePoint(high_x, high_y), TreePoint(low_x, low_y));
     }
 
     // Update the Rect pointed to by r with the contents of a Node pointed to by n
@@ -423,7 +423,7 @@ private:
     }
 
     // Calculate Euclidean distance between points
-    double distance(Point p1, Point p2)
+    double distance(TreePoint p1, TreePoint p2)
     {
         double x = p1.x - p2.x; //calculating number to square in next step
         double y = p1.y - p2.y;
@@ -450,7 +450,7 @@ public:
     }
 
     // Insert a point into the tree
-    void insert(Point p){
+    void insert(TreePoint p){
         if(VERBOSE) {std::cout<<"insert " << p.x << " " << p.y << "\n";}
         std::cout<<"insert " << p.x << " " << p.y << "\n";
         // I1. Find position for new record
@@ -472,7 +472,7 @@ public:
 
         // I4. Grow tree taller if root splits
         if(l == root && ll != nullptr) {
-            std::cout << "SPLIT 1 - ROOT IS LEAF\n";
+            //std::cout << "SPLIT 1 - ROOT IS LEAF\n";
 
             root = new Node();
             Rect l_r = getRect(l);
@@ -486,7 +486,7 @@ public:
 
             root->is_leaf = false;
         } else if(root_split) {
-            std::cout << "SPLIT 2 - ROOT IS BRANCH\n";
+            //std::cout << "SPLIT 2 - ROOT IS BRANCH\n";
             m_height +=1;
 
             Node* root_copy = root;
@@ -502,9 +502,9 @@ public:
 
             root->is_leaf = false;
         } else if (split_nn != nullptr) { // Non-root branch split
-            std::cout << "SPILT 3 - Non-root branch split\n";
+            //std::cout << "SPILT 3 - Non-root branch split\n";
         } else if (ll != nullptr) { // Non-root leaf split
-            std::cout << "SPILT 4 - Non-root leaf split\n";
+            //std::cout << "SPILT 4 - Non-root leaf split\n";
         }
 
         m_size +=1;
@@ -529,13 +529,13 @@ public:
     }
 
     // Return the closest point in the tree to point Q
-    Point closest_point(Point q) {
+    TreePoint closest_point(TreePoint q) {
         Node* l = chooseLeaf(root, q);
 
         double min_distance = std::numeric_limits<double>::max();
-        Point closest;
+        TreePoint closest;
 
-        for(Point p : l->points) {
+        for(TreePoint p : l->points) {
             double p_distance = distance(p, q);
             if(p_distance < min_distance) {
                 min_distance = p_distance;

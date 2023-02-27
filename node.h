@@ -17,7 +17,7 @@ class Node
     
     public:
     std::vector<Entry*> entries;
-    std::vector<Point> points;
+    std::vector<TreePoint> points;
     bool is_leaf;
     const int MAX_CAPACITY = 5; // Max # of children a node may have
 
@@ -73,7 +73,7 @@ class Node
     void print(std::string indent = "") {
         if(isLeaf()) {
             std::cout << "LEAF [";
-            for(Point p : points) {
+            for(TreePoint p : points) {
                 std::cout << p.id << ": (" << p.x << ", " << p.y << "),\t";
             }
             std::cout << "]\n";
