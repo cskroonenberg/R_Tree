@@ -4,15 +4,15 @@
 class TreePoint
 {
     public:
-    double x;
-    double y;
+    float x;
+    float y;
     long id;
 
-    TreePoint(double x, double y) : x(x), y(y) {
+    TreePoint(float x, float y) : x(x), y(y) {
         id = -1;
     }
     
-    TreePoint(double x, double y, long id) : x(x), y(y), id(id) {}
+    TreePoint(float x, float y, long id) : x(x), y(y), id(id) {}
 
     TreePoint() {
         x = -1;

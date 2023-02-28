@@ -423,11 +423,11 @@ private:
     }
 
     // Calculate Euclidean distance between points
-    double distance(TreePoint p1, TreePoint p2)
+    float distance(TreePoint p1, TreePoint p2)
     {
-        double x = p1.x - p2.x; //calculating number to square in next step
-        double y = p1.y - p2.y;
-        double dist;
+        float x = p1.x - p2.x; //calculating number to square in next step
+        float y = p1.y - p2.y;
+        float dist;
 
         dist = pow(x, 2) + pow(y, 2);       //calculating Euclidean distance
         dist = sqrt(dist);                  
@@ -532,11 +532,11 @@ public:
     TreePoint closest_point(TreePoint q) {
         Node* l = chooseLeaf(root, q);
 
-        double min_distance = std::numeric_limits<double>::max();
+        float min_distance = std::numeric_limits<float>::max();
         TreePoint closest;
 
         for(TreePoint p : l->points) {
-            double p_distance = distance(p, q);
+            float p_distance = distance(p, q);
             if(p_distance < min_distance) {
                 min_distance = p_distance;
                 closest = p;
